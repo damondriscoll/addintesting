@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:type="MailApp">
   <Id>36a4d8e0-daf5-4d0e-a44b-7a18aa4c52b9</Id>
   <Version>1.0.0.0</Version>
-  <ProviderName>Your Provider Name</ProviderName>
+  <ProviderName>PerrKnight</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="Forward as Attachment Add-in"/>
   <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
-  
+  <SupportUrl DefaultValue="google.com"/>
+  <AppDomains>
+    <AppDomain>https://www.github.com</AppDomain>
+  </AppDomains>
+
   <!-- Permissions needed to read current item and create new mail with attachments -->
   <Permissions>ReadWriteMailbox</Permissions>
 
@@ -16,6 +20,12 @@
   <Hosts>
     <Host Name="Mailbox"/>
   </Hosts>
+
+  <Requirements>
+    <Sets>
+      <Set Name="Mailbox" MinVersion="1.1"/>
+    </Sets>
+  </Requirements>
 
   <DefaultSettings>
     <!-- We remove any SourceLocation reference (like home.html) -->
