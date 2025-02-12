@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:type="MailApp">
+  <Id>00000000-0000-0000-0000-000000000000</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Your Provider Name</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Forward as Attachment Add-in"/>
+  <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
+  <IconUrl DefaultValue="https://your-deployment-url/assets/icon-32.png"/>
+  
+  <!-- Specify the set of permissions required by your add-in -->
+  <Permissions>ReadWriteMailbox</Permissions>
+  
+  <!-- Hosts -->
+  <Hosts>
+    <Host Name="Mailbox"/>
+  </Hosts>
+
+  <!-- Default settings for the add-in -->
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://your-deployment-url/home.html"/>
+    <!-- Add custom functions/commands -->
+    <ExtensionPoint xsi:type="MessageReadCommandSurface">
+      <OfficeTab id="TabDefault">
+        <Group id="CustomButtonGroup">
+          <Label resid="groupLabel"/>
+          <Icon>
+            <bt:Image size="16" resid="icon16"/>
+            <bt:Image size="32" resid="icon32"/>
+            <bt:Image size="80" resid="icon80"/>
+          </Icon>
+          <Control xsi:type="Button" id="ForwardAsAttachmentButton">
+            <Label resid="buttonLabel"/>
+            <Supertip>
+              <Title resid="buttonLabel"/>
+              <Description resid="buttonDescription"/>
+            </Supertip>
+            <Icon>
+              <bt:Image size="16" resid="icon16"/>
+              <bt:Image size="32" resid="icon32"/>
+              <bt:Image size="80" resid="icon80"/>
+            </Icon>
+            <Action xsi:type="ExecuteFunction">
+              <FunctionName>forwardAsAttachment</FunctionName>
+            </Action>
+          </Control>
+        </Group>
+      </OfficeTab>
+    </ExtensionPoint>
+
+    <!-- Localized strings -->
+    <Resources>
+      <bt:Images>
+        <bt:Image id="icon16" DefaultValue="https://your-deployment-url/assets/icon-16.png"/>
+        <bt:Image id="icon32" DefaultValue="https://your-deployment-url/assets/icon-32.png"/>
+        <bt:Image id="icon80" DefaultValue="https://your-deployment-url/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="MessageReadFunctionFileUrl" DefaultValue="https://your-deployment-url/function-file.html"/>
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="groupLabel" DefaultValue="Custom Actions"/>
+        <bt:String id="buttonLabel" DefaultValue="Forward as Attachment"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="buttonDescription" DefaultValue="Forward this email (as an attachment) to a specific recipient."/>
+      </bt:LongStrings>
+    </Resources>
+  </DefaultSettings>
+  
+  <!-- Specify the function file for the Outlook add-in commands -->
+  <VersionOverrides  xsi:type="VersionOverrides" 
+                     xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+                     Version="1.0">
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <FunctionFile resid="functionFile" />
+      </Host>
+    </Hosts>
+    <Resources>
+      <FunctionFile resid="functionFile" src="https://your-deployment-url/function-file.html"/>
+    </Resources>
+    <Requirements>
+      <Sets DefaultMinVersion="1.1">
+        <Set Name="Mailbox" />
+      </Sets>
+    </Requirements>
+  </VersionOverrides>
+</OfficeApp>
