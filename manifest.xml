@@ -1,174 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OfficeApp
-  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-  xmlns:mailor="http://schemas.microsoft.com/office/mailappversionoverrides"
-  xsi:type="MailApp"
->
+          xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+          xsi:type="MailApp">
 
-  <!-- 1) Required Basic Metadata -->
-  <!-- Update to a unique GUID for your add-in -->
+  <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
+
+  <!-- Unique add-in ID (GUID). Updated to match your add-in. -->
   <Id>36a4d8e0-daf5-4d0e-a44b-7a18aa4c52b9</Id>
-  
-  <!-- Optional AlternateId can be included if needed, but it's omitted here. -->
-  <!-- <AlternateId>...</AlternateId> -->
 
-  <!-- Update version each time you publish/update your add-in -->
+  <!-- Version. Increment whenever you publish an update. -->
   <Version>1.0.0.0</Version>
-  
-  <!-- Short string: your organization or publisher name -->
+
+  <!-- Your provider/organization name. -->
   <ProviderName>PerrKnight</ProviderName>
-  
-  <!-- The default language/locale for your add-in -->
+
+  <!-- Default locale/language. -->
   <DefaultLocale>en-US</DefaultLocale>
 
-  <!-- 2) DisplayName & Description (both are "locale-aware" per schema) -->
-  <DisplayName DefaultValue="Forward as Attachment Add-in"/>
+  <!-- Display name shown in Outlook UI. -->
+  <DisplayName DefaultValue="Forward as Attachment Add-in" />
   <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
-  
-  <!-- 3) Icon URLs (locale-aware URL settings). These are optional but recommended. -->
-  <!-- Replace with real HTTPS URLs to your icons, or remove if you prefer. -->
-  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon64.png"/>
-  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
-  
-  <!-- 4) Support page (optional). Update or remove if you don’t have one. -->
-  <SupportUrl DefaultValue="https://www.google.com"/>
 
-  <!-- 5) AppDomains (if you load any external resources). Add or remove as necessary. -->
+  <!-- Icons for the add-in (used in various dialogs/UI). Update with your HTTPS icon URLs. -->
+  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-64.png" />
+  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-128.png"/>
+
+  <!-- A support page URL, if you have one. -->
+  <SupportUrl DefaultValue="https://www.google.com" />
+
+  <!-- Domains allowed for navigation (links, iframes, etc.). -->
   <AppDomains>
     <AppDomain>https://www.github.com</AppDomain>
+    <AppDomain>https://raw.githubusercontent.com</AppDomain>
+    <AppDomain>https://www.google.com</AppDomain>
   </AppDomains>
+  <!-- End Basic Settings. -->
 
-  <!-- 6) Hosts element indicates this add-in supports the Mailbox host (Outlook). -->
   <Hosts>
-    <Host Name="Mailbox"/>
+    <Host Name="Mailbox" />
   </Hosts>
-
-  <!-- 7) Requirements fallback. The real version requirements are typically declared under VersionOverrides -->
   <Requirements>
     <Sets>
-      <!-- At minimum, indicate Mailbox v1.1. You can adjust as needed. -->
-      <Set Name="Mailbox" MinVersion="1.1"/>
+      <Set Name="Mailbox" MinVersion="1.1" />
     </Sets>
   </Requirements>
 
-  <!-- 8) FormSettings: required for validation, even if we override via VersionOverrides. -->
+  <!-- FormSettings is required for validation, even if you also rely on add-in commands below. -->
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <!-- A placeholder URL for the old form model. 
-             It won't be used if VersionOverrides is present, but is required by the schema. -->
-        <SourceLocation DefaultValue="https://contoso.com/MessageReadPlaceholder.html"/>
+        <!-- A placeholder page for older form-based activation. It won't be used if you rely on commands. -->
+        <SourceLocation DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/index.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
-    <!-- If you needed an ItemEdit form, you could include a second <Form xsi:type="ItemEdit"> block here. -->
   </FormSettings>
 
-  <!-- 9) Permissions per the schema: 
-        - Restricted, ReadItem, ReadWriteItem, or ReadWriteMailbox. 
-        - Choose based on your add-in’s needs. -->
+  <!-- Permission level. For forwarding as attachment, ReadWriteMailbox is often needed. -->
   <Permissions>ReadWriteMailbox</Permissions>
 
-  <!-- 10) Rule: also required by the schema. Typically, we enable it for messages in read mode. -->
-  <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
+  <!-- Rule to activate this add-in when a Message is open in read mode. -->
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
+  </Rule>
+  <DisableEntityHighlighting>false</DisableEntityHighlighting>
 
-  <!-- 11) Optionally disable entity highlighting (not needed here). -->
-  <!-- <DisableEntityHighlighting>false</DisableEntityHighlighting> -->
+  <!-- VersionOverrides block in the mailappversionoverrides 1.0 namespace -->
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Requirements>
+      <bt:Sets DefaultMinVersion="1.3">
+        <bt:Set Name="Mailbox" />
+      </bt:Sets>
+    </Requirements>
+    <Hosts>
+      <Host xsi:type="MailHost">
+        <DesktopFormFactor>
+          <!-- A function file for potential ExecuteFunction actions (UI-less commands). -->
+          <FunctionFile resid="Commands.Url" />
 
-  <!-- 12) The crucial piece: mailor:VersionOverrides for add-in commands, launched from the ribbon. -->
-  <mailor:VersionOverrides
-    xmlns="http://schemas.microsoft.com/office/mailappversionoverrides"
-    xsi:type="VersionOverridesV1_0">
-    
-    <!-- You can also nest a second <VersionOverrides> with xsi:type="VersionOverridesV1_1" if needed 
-         for advanced commands or new feature sets. For simplicity, we'll stick with V1_0 or V1_1. -->
+          <!-- ExtensionPoint: A button on the Message Read surface -->
+          <ExtensionPoint xsi:type="MessageReadCommandSurface">
+            <OfficeTab id="TabDefault">
+              <Group id="msgReadGroup">
+                <Label resid="GroupLabel" />
 
-    <!-- We'll show the common pattern for Add-in Commands. 
-         If you want to use the 1.1 command schema, you'd do: 
-         <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
-         inside. -->
+                <!-- Single button that currently shows a Task Pane.
+                     (Structure unchanged; you could repurpose it to call a function if you like.) -->
+                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                  <Label resid="TaskpaneButton.Label" />
+                  <Supertip>
+                    <Title resid="TaskpaneButton.Label" />
+                    <Description resid="TaskpaneButton.Tooltip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16" />
+                    <bt:Image size="32" resid="Icon.32x32" />
+                    <bt:Image size="80" resid="Icon.80x80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <SourceLocation resid="Taskpane.Url" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
 
-    <!-- Example with 1.1, which is standard for “command surfaces”: -->
-    <mailor:VersionOverrides
-      xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1"
-      xsi:type="VersionOverridesV1_1">
-      
-      <!-- 12a) Requirements specific to command surfaces (often 1.3 or higher). -->
-      <Requirements>
-        <bt:Sets DefaultMinVersion="1.3">
-          <bt:Set Name="Mailbox" />
-        </bt:Sets>
-      </Requirements>
-
-      <Hosts>
-        <Host xsi:type="MailHost">
-          <DesktopFormFactor>
-            <!-- The FunctionFile references your HTML/JS that define the JavaScript functions. -->
-            <FunctionFile resid="functionFile"/>
-
-            <!-- This extension point adds a button on the Message Read surface (Outlook ribbon). -->
-            <ExtensionPoint xsi:type="MessageReadCommandSurface">
-              <OfficeTab id="TabDefault">
-                <Group id="msgReadGroup">
-                  <Label resid="groupLabel"/>
-
-                  <!-- Single Button: "Forward as Attachment" -->
-                  <Control xsi:type="Button" id="forwardButton">
-                    <Label resid="forwardButtonLabel"/>
-                    <Supertip>
-                      <Title resid="forwardButtonLabel"/>
-                      <Description resid="forwardButtonDescription"/>
-                    </Supertip>
-                    <Icon>
-                      <!-- If you have icons, reference them here. -->
-                      <bt:Image size="16" resid="icon16"/>
-                      <bt:Image size="32" resid="icon32"/>
-                      <bt:Image size="80" resid="icon80"/>
-                    </Icon>
-                    <!-- The button calls a function in your JavaScript: "forwardAsAttachment" -->
-                    <Action xsi:type="ExecuteFunction">
-                      <FunctionName>forwardAsAttachment</FunctionName>
-                    </Action>
-                  </Control>
-
-                </Group>
-              </OfficeTab>
-            </ExtensionPoint>
-
-          </DesktopFormFactor>
-        </Host>
-      </Hosts>
-
-      <!-- 12b) Declare images, URLs, and localized strings used by commands. -->
-      <Resources>
-        <bt:Images>
-          <!-- Use your own HTTPS-based icon locations or placeholders. -->
-          <bt:Image id="icon16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon16.png"/>
-          <bt:Image id="icon32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon32.png"/>
-          <bt:Image id="icon80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
-        </bt:Images>
-
-        <bt:Urls>
-          <!-- functionFile is your HTML page that loads Office.js and your add-in script. -->
-          <bt:Url id="functionFile" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html"/>
-        </bt:Urls>
-
-        <bt:ShortStrings>
-          <!-- The label for the group. -->
-          <bt:String id="groupLabel" DefaultValue="Add-in Commands"/>
-          <!-- The label for the button. -->
-          <bt:String id="forwardButtonLabel" DefaultValue="Forward as Attachment"/>
-        </bt:ShortStrings>
-
-        <bt:LongStrings>
-          <!-- Tooltip/description for the button. -->
-          <bt:String id="forwardButtonDescription" DefaultValue="Forward the current email as an attachment to a specific address."/>
-        </bt:LongStrings>
-      </Resources>
-
-    </mailor:VersionOverrides>
-  </mailor:VersionOverrides>
-
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Icon.16x16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-80.png"/>
+      </bt:Images>
+      <bt:Urls>
+        <!-- Points to the HTML pages for commands & task pane. -->
+        <bt:Url id="Commands.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/commands.html" />
+        <bt:Url id="Taskpane.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/taskpane.html" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <!-- Adjusted labels for the group & button. -->
+        <bt:String id="GroupLabel" DefaultValue="Forward Add-in"/>
+        <bt:String id="TaskpaneButton.Label" DefaultValue="Forward as Attachment"/>
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Forward the currently selected email as an attachment to a specific address."/>
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
 </OfficeApp>
