@@ -1,89 +1,177 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" xsi:type="MailApp">
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-           xsi:type="MailApp">
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+  xsi:type="MailApp">
+
+  <!-- Begin basic settings: Add-in metadata used for all versions of Outlook, unless override provided. -->
+
+  <!-- IMPORTANT: Unique add-in ID -->
   <Id>36a4d8e0-daf5-4d0e-a44b-7a18aa4c52b9</Id>
+  <!-- Updates from the Office Store only get triggered if there is a version change. -->
   <Version>1.0.0.0</Version>
   <ProviderName>PerrKnight</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
+
+  <!-- Display name used in Outlook UI (e.g. in the ribbon or add-ins list). -->
   <DisplayName DefaultValue="Forward as Attachment Add-in"/>
+  <!-- Short description of the add-in. -->
   <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
+  
+  <!-- Icons (64px and high-res) shown in various UI contexts. Replace these with actual image URLs if desired. -->
+  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon64.png"/>
+  
+  <!-- A link to your support page (or any help documentation). -->
   <SupportUrl DefaultValue="google.com"/>
+  
+  <!-- Domains allowed for navigation. -->
   <AppDomains>
     <AppDomain>https://www.github.com</AppDomain>
   </AppDomains>
+  
+  <!-- End basic settings. -->
 
-  <!-- Permissions needed to read current item and create new mail with attachments -->
-  <Permissions>ReadWriteMailbox</Permissions>
-
-  <!-- Host specification (supports Outlook) -->
   <Hosts>
     <Host Name="Mailbox"/>
   </Hosts>
 
+  <!-- The <Requirements> element here is overridden by any <Requirements> element inside a <VersionOverrides> element. -->
   <Requirements>
     <Sets>
       <Set Name="Mailbox" MinVersion="1.1"/>
     </Sets>
   </Requirements>
 
-  <DefaultSettings>
-    <!-- We remove any SourceLocation reference (like home.html) -->
-    
-    <!-- Define the button on the message read surface -->
-    <ExtensionPoint xsi:type="MessageReadCommandSurface">
-      <OfficeTab id="TabDefault">
-        <Group id="CustomButtonGroup">
-          <!-- Minimal group; no icons needed -->
-          <Control xsi:type="Button" id="ForwardAsAttachmentButton">
-            <Label resid="buttonLabel"/>
-            <Supertip>
-              <Title resid="buttonLabel"/>
-              <Description resid="buttonDescription"/>
-            </Supertip>
-            <!-- When the user clicks the button, it calls our function -->
-            <Action xsi:type="ExecuteFunction">
-              <FunctionName>forwardAsAttachment</FunctionName>
-            </Action>
-          </Control>
-        </Group>
-      </OfficeTab>
-    </ExtensionPoint>
+  <!-- The <FormSettings> element is required for validation, but is ignored when there's a <VersionOverrides> element. -->
+  <FormSettings>
+    <Form xsi:type="ItemRead">
+      <DesktopSettings>
+        <!-- If you have a task pane page specifically for ItemRead, put its URL here. It is ignored when VersionOverrides is present but required for validation. -->
+        <SourceLocation DefaultValue=""/>
+        <RequestedHeight>250</RequestedHeight>
+      </DesktopSettings>
+    </Form>
+  </FormSettings>
 
-    <!-- Minimal resource strings -->
-    <Resources>
-      <bt:ShortStrings>
-        <bt:String id="buttonLabel" DefaultValue="Forward as Attachment"/>
-      </bt:ShortStrings>
-      <bt:LongStrings>
-        <bt:String id="buttonDescription" DefaultValue="Forward this email (as an attachment) to a specific address."/>
-      </bt:LongStrings>
-    </Resources>
-  </DefaultSettings>
+  <!-- Permissions. The schema example shows ReadWriteItem, but you have indicated ReadWriteMailbox is needed. -->
+  <Permissions>ReadWriteMailbox</Permissions>
 
-  <!-- VersionOverrides for add-in commands -->
+  <!-- The <Rule> element is required for validation, but is ignored when there's a <VersionOverrides> element. -->
+  <Rule xsi:type="RuleCollection" Mode="Or">
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
+  </Rule>
+
+  <!-- Begin VersionOverrides -->
   <VersionOverrides 
-      xsi:type="VersionOverrides" 
-      xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
-      Version="1.0">
-    <Hosts>
-      <Host xsi:type="MailHost">
-        <FunctionFile resid="functionFile"/>
-      </Host>
-    </Hosts>
+    xmlns="http://schemas.microsoft.com/office/mailappversionoverrides"
+    xsi:type="VersionOverridesV1_0">
 
-    <!-- Point to our function-file.html -->
-    <Resources>
-      <FunctionFile 
-        resid="functionFile" 
-        src="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html" />
-    </Resources>
+    <!-- The nested VersionOverrides that actually defines your commands and resources. -->
+    <VersionOverrides 
+      xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" 
+      xsi:type="VersionOverridesV1_1">
 
-    <!-- Basic mailbox requirement set -->
-    <Requirements>
-      <Sets DefaultMinVersion="1.1">
-        <Set Name="Mailbox"/>
-      </Sets>
-    </Requirements>
+      <!-- Updated mailbox requirement (from example uses 1.13). -->
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.13">
+          <bt:Set Name="Mailbox"/>
+        </bt:Sets>
+      </Requirements>
+
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <DesktopFormFactor>
+            <!-- FunctionFile references your actual JavaScript function definitions. -->
+            <FunctionFile resid="functionFile"/>
+
+            <!-- 
+              Activates on the Message Read surface, adding 2 buttons:
+                1) "Show Task Pane"
+                2) "Forward as Attachment"
+            -->
+            <ExtensionPoint xsi:type="MessageReadCommandSurface">
+              <!-- Use the default tab or create your own <CustomTab>. Here we use TabDefault. -->
+              <OfficeTab id="TabDefault">
+                <Group id="msgReadGroup">
+                  <!-- The label for this group is defined in <Resources> as "groupLabel". -->
+                  <Label resid="groupLabel"/>
+
+                  <!-- Button #1: Show a Task Pane. -->
+                  <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                    <Label resid="taskPaneButtonLabel"/>
+                    <Supertip>
+                      <Title resid="taskPaneButtonLabel"/>
+                      <Description resid="taskPaneButtonDescription"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="icon16"/>
+                      <bt:Image size="32" resid="icon32"/>
+                      <bt:Image size="80" resid="icon80"/>
+                    </Icon>
+                    <Action xsi:type="ShowTaskpane">
+                      <SourceLocation resid="messageReadTaskPaneUrl"/>
+                    </Action>
+                  </Control>
+
+                  <!-- Button #2: Executes a function named "forwardAsAttachment". -->
+                  <Control xsi:type="Button" id="msgReadActionButton">
+                    <Label resid="actionButtonLabel"/>
+                    <Supertip>
+                      <Title resid="actionButtonLabel"/>
+                      <Description resid="actionButtonDescription"/>
+                    </Supertip>
+                    <Icon>
+                      <bt:Image size="16" resid="icon16"/>
+                      <bt:Image size="32" resid="icon32"/>
+                      <bt:Image size="80" resid="icon80"/>
+                    </Icon>
+                    <Action xsi:type="ExecuteFunction">
+                      <!-- IMPORTANT: This must match the function name in your JavaScript. -->
+                      <FunctionName>forwardAsAttachment</FunctionName>
+                    </Action>
+                  </Control>
+
+                </Group>
+              </OfficeTab>
+            </ExtensionPoint>
+
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+
+      <!-- Define images, URLs, and strings used by the add-in. -->
+      <Resources>
+        <bt:Images>
+          <!-- Replace these icon URLs with your own if desired. -->
+          <bt:Image id="icon16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon16.png"/>
+          <bt:Image id="icon32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon32.png"/>
+          <bt:Image id="icon80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
+        </bt:Images>
+
+        <bt:Urls>
+          <!-- The FunctionFile is your JavaScript entry point. -->
+          <bt:Url id="functionFile" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html"/>
+          <!-- The URL for the task pane you want to show when "Show Task Pane" is clicked. -->
+          <bt:Url id="messageReadTaskPaneUrl" DefaultValue="https://contoso.com/MessageRead.html"/>
+        </bt:Urls>
+
+        <!-- Short strings for control labels. -->
+        <bt:ShortStrings>
+          <bt:String id="groupLabel" DefaultValue="My Add-in Group"/>
+          <bt:String id="taskPaneButtonLabel" DefaultValue="Show Task Pane"/>
+          <bt:String id="actionButtonLabel" DefaultValue="Forward as Attachment"/>
+        </bt:ShortStrings>
+
+        <!-- Longer strings for tooltips/descriptions. -->
+        <bt:LongStrings>
+          <bt:String id="taskPaneButtonDescription" DefaultValue="Opens a task pane to demonstrate UI."/>
+          <bt:String id="actionButtonDescription" DefaultValue="Click to forward the current message as an attachment."/>
+        </bt:LongStrings>
+      </Resources>
+
+    </VersionOverrides>
   </VersionOverrides>
 </OfficeApp>
