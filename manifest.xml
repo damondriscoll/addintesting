@@ -25,8 +25,8 @@
   <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
 
   <!-- Icons for the add-in (used in various dialogs/UI). Update with your HTTPS icon URLs. -->
-  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-64.png" />
-  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-128.png"/>
+  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon64.png" />
+  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
 
   <!-- A support page URL, if you have one. -->
   <SupportUrl DefaultValue="https://www.google.com" />
@@ -53,7 +53,7 @@
     <Form xsi:type="ItemRead">
       <DesktopSettings>
         <!-- A placeholder page for older form-based activation. It won't be used if you rely on commands. -->
-        <SourceLocation DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/index.html"/>
+        <SourceLocation DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
@@ -79,7 +79,7 @@
       <Host xsi:type="MailHost">
         <DesktopFormFactor>
           <!-- A function file for potential ExecuteFunction actions (UI-less commands). -->
-          <FunctionFile resid="Commands.Url" />
+          <FunctionFile resid="Addin.Url" />
 
           <!-- ExtensionPoint: A button on the Message Read surface -->
           <ExtensionPoint xsi:type="MessageReadCommandSurface">
@@ -89,7 +89,7 @@
 
                 <!-- Single button that currently shows a Task Pane.
                      (Structure unchanged; you could repurpose it to call a function if you like.) -->
-                <Control xsi:type="Button" id="msgReadOpenPaneButton">
+                <Control xsi:type="Button" id="msgReadExecuteFunctionButton">
                   <Label resid="TaskpaneButton.Label" />
                   <Supertip>
                     <Title resid="TaskpaneButton.Label" />
@@ -100,8 +100,8 @@
                     <bt:Image size="32" resid="Icon.32x32" />
                     <bt:Image size="80" resid="Icon.80x80" />
                   </Icon>
-                  <Action xsi:type="ShowTaskpane">
-                    <SourceLocation resid="Taskpane.Url" />
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>forwardAsAttachment</FunctionName>
                   </Action>
                 </Control>
               </Group>
@@ -113,14 +113,13 @@
 
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon-80.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon16.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon32.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
       </bt:Images>
       <bt:Urls>
         <!-- Points to the HTML pages for commands & task pane. -->
-        <bt:Url id="Commands.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/commands.html" />
-        <bt:Url id="Taskpane.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/taskpane.html" />
+        <bt:Url id="Addin.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html" />
       </bt:Urls>
       <bt:ShortStrings>
         <!-- Adjusted labels for the group & button. -->
@@ -133,3 +132,4 @@
     </Resources>
   </VersionOverrides>
 </OfficeApp>
+
