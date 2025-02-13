@@ -1,135 +1,104 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<OfficeApp
-          xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
-          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0"
+<OfficeApp 
+          xmlns="http://schemas.microsoft.com/office/appforoffice/1.1" 
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+          xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0" 
+          xmlns:mailappor="http://schemas.microsoft.com/office/mailappversionoverrides/1.0" 
           xsi:type="MailApp">
 
-  <!-- Begin Basic Settings: Add-in metadata, used for all versions of Office unless override provided. -->
-
-  <!-- Unique add-in ID (GUID). Updated to match your add-in. -->
   <Id>36a4d8e0-daf5-4d0e-a44b-7a18aa4c52b9</Id>
-
-  <!-- Version. Increment whenever you publish an update. -->
+  <!-- IMPORTANT: ID must be unique for your add-in. If you reuse this manifest, ensure that you change this ID to a new GUID. -->
   <Version>1.0.0.0</Version>
-
-  <!-- Your provider/organization name. -->
-  <ProviderName>PerrKnight</ProviderName>
-
-  <!-- Default locale/language. -->
+  <ProviderName>Perr&Knight</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
-
-  <!-- Display name shown in Outlook UI. -->
-  <DisplayName DefaultValue="Forward as Attachment Add-in" />
-  <Description DefaultValue="Forwards the currently selected email as an attachment to a specific address."/>
-
-  <!-- Icons for the add-in (used in various dialogs/UI). Update with your HTTPS icon URLs. -->
-  <IconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon64.png" />
-  <HighResolutionIconUrl DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
-
-  <!-- A support page URL, if you have one. -->
-  <SupportUrl DefaultValue="https://www.google.com" />
-
-  <!-- Domains allowed for navigation (links, iframes, etc.). -->
+  <DisplayName DefaultValue="Outlook Forward Add-in"/>
+  <Description DefaultValue="Report spam or phishing emails using a spam-reporting add-in."/>
+  <IconUrl DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/outlook-spam-reporting/assets/icon-64.png"/>
+  <HighResolutionIconUrl DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/outlook-spam-reporting/assets/icon-128.png"/>
+  <SupportUrl DefaultValue="https://learn.microsoft.com/office/dev/add-ins/outlook/spam-reporting" />
   <AppDomains>
-    <AppDomain>https://www.github.com</AppDomain>
-    <AppDomain>https://raw.githubusercontent.com</AppDomain>
-    <AppDomain>https://www.google.com</AppDomain>
+    <AppDomain>https://officedev.github.io</AppDomain>
   </AppDomains>
-  <!-- End Basic Settings. -->
-
   <Hosts>
-    <Host Name="Mailbox" />
+    <Host Name="Mailbox"/>
   </Hosts>
   <Requirements>
     <Sets>
-      <Set Name="Mailbox" MinVersion="1.1" />
+      <Set Name="Mailbox" MinVersion="1.1"/>
     </Sets>
   </Requirements>
-
-  <!-- FormSettings is required for validation, even if you also rely on add-in commands below. -->
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
-        <!-- A placeholder page for older form-based activation. It won't be used if you rely on commands. -->
-        <SourceLocation DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html"/>
+        <SourceLocation DefaultValue="https://damondriscoll.github.io/addintesting/addin.html"/>
         <RequestedHeight>250</RequestedHeight>
       </DesktopSettings>
     </Form>
   </FormSettings>
 
-  <!-- Permission level. For forwarding as attachment, ReadWriteMailbox is often needed. -->
   <Permissions>ReadWriteMailbox</Permissions>
-
-  <!-- Rule to activate this add-in when a Message is open in read mode. -->
   <Rule xsi:type="RuleCollection" Mode="Or">
-    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read" />
+    <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
   <DisableEntityHighlighting>false</DisableEntityHighlighting>
 
-  <!-- VersionOverrides block in the mailappversionoverrides 1.0 namespace -->
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides" xsi:type="VersionOverridesV1_0">
-    <Requirements>
-      <bt:Sets DefaultMinVersion="1.3">
-        <bt:Set Name="Mailbox" />
-      </bt:Sets>
-    </Requirements>
-    <Hosts>
-      <Host xsi:type="MailHost">
-        <DesktopFormFactor>
-          <!-- A function file for potential ExecuteFunction actions (UI-less commands). -->
-          <FunctionFile resid="Addin.Url" />
-
-          <!-- ExtensionPoint: A button on the Message Read surface -->
-          <ExtensionPoint xsi:type="MessageReadCommandSurface">
-            <OfficeTab id="TabDefault">
-              <Group id="msgReadGroup">
-                <Label resid="GroupLabel" />
-
-                <!-- Single button that currently shows a Task Pane.
-                     (Structure unchanged; you could repurpose it to call a function if you like.) -->
-                <Control xsi:type="Button" id="msgReadExecuteFunctionButton">
-                  <Label resid="TaskpaneButton.Label" />
+    <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides/1.1" xsi:type="VersionOverridesV1_1">
+      <Requirements>
+        <bt:Sets DefaultMinVersion="1.13">
+          <bt:Set Name="Mailbox" MinVersion="1.3"/>
+        </bt:Sets>
+      </Requirements>
+      <Hosts>
+        <Host xsi:type="MailHost">
+          <Runtimes>
+            <Runtime resid="WebViewRuntime.Url">
+              <!-- References the JavaScript file that contains the spam-reporting event handler. This is used by classic Outlook on Windows. -->
+              <Override type="javascript" resid="JSRuntime.Url"/>
+            </Runtime>
+          </Runtimes>
+          <DesktopFormFactor>
+            <FunctionFile resid="WebViewRuntime.Url"/>
+            <!-- Implements the integrated spam-reporting feature in the add-in. -->
+            <ExtensionPoint xsi:type="ReportPhishingCommandSurface">
+              <ReportPhishingCustomization>
+                <!-- Configures the ribbon button. -->
+                <Control xsi:type="Button" id="spamReportingButton">
+                  <Label resid="spamButton.Label"/>
                   <Supertip>
-                    <Title resid="TaskpaneButton.Label" />
-                    <Description resid="TaskpaneButton.Tooltip" />
+                    <Title resid="spamButton.Label"/>
                   </Supertip>
                   <Icon>
-                    <bt:Image size="16" resid="Icon.16x16" />
-                    <bt:Image size="32" resid="Icon.32x32" />
-                    <bt:Image size="80" resid="Icon.80x80" />
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
                     <FunctionName>forwardAsAttachment</FunctionName>
                   </Action>
                 </Control>
-              </Group>
-            </OfficeTab>
-          </ExtensionPoint>
-        </DesktopFormFactor>
-      </Host>
-    </Hosts>
-
-    <Resources>
-      <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon16.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon32.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/assets/icon80.png"/>
-      </bt:Images>
-      <bt:Urls>
-        <!-- Points to the HTML pages for commands & task pane. -->
-        <bt:Url id="Addin.Url" DefaultValue="https://raw.githubusercontent.com/damondriscoll/addintesting/refs/heads/main/addin.html" />
-      </bt:Urls>
-      <bt:ShortStrings>
-        <!-- Adjusted labels for the group & button. -->
-        <bt:String id="GroupLabel" DefaultValue="Forward Add-in"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Forward as Attachment"/>
-      </bt:ShortStrings>
-      <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Forward the currently selected email as an attachment to a specific address."/>
-      </bt:LongStrings>
-    </Resources>
+                <!-- Configures the preprocessing dialog. -->
+                <!-- Identifies the runtime to be used. This is also referenced by the Runtime element. -->
+                <SourceLocation resid="WebViewRuntime.Url"/>
+              </ReportPhishingCustomization>
+            </ExtensionPoint>
+          </DesktopFormFactor>
+        </Host>
+      </Hosts>
+      <Resources>
+        <bt:Images>
+          <bt:Image id="Icon.16x16" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/outlook-spam-reporting/assets/icon-16.png"/>
+          <bt:Image id="Icon.32x32" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/outlook-spam-reporting/assets/icon-32.png"/>
+          <bt:Image id="Icon.80x80" DefaultValue="https://officedev.github.io/Office-Add-in-samples/Samples/outlook-spam-reporting/assets/icon-80.png"/>
+        </bt:Images>
+        <bt:Urls>
+          <bt:Url id="WebViewRuntime.Url" DefaultValue="https://damondriscoll.github.io/addintesting/addin.html"/>
+          <bt:Url id="JSRuntime.Url" DefaultValue="https://damondriscoll.github.io/addintesting/addin.js"/>
+        </bt:Urls>
+        <bt:ShortStrings>
+          <bt:String id="spamButton.Label" DefaultValue="Report Spam Message"/>
+        </bt:ShortStrings>
+      </Resources>
+    </VersionOverrides>
   </VersionOverrides>
 </OfficeApp>
-
