@@ -1,8 +1,4 @@
-Office.onReady(function (info) {
-  if (info.host === Office.HostType.Outlook) {
-      console.log("Add-in is ready");
-  }
-});
+Office.onReady();
 
 function forwardAsAttachment(event) {
   try {
@@ -34,3 +30,9 @@ function forwardAsAttachment(event) {
       event.completed();
   }
 }
+
+/**
+ * IMPORTANT: To ensure your add-in is supported in Outlook, remember to map the event handler name
+ * specified in the manifest to its JavaScript counterpart.
+ */
+Office.actions.associate("forwardAsAttachment", forwardAsAttachment);
