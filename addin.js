@@ -1,35 +1,36 @@
-function forwardAsAttachment() {
-    Office.onReady((info) => {
-      if (info.host === Office.HostType.Outlook) {
-        // The currently selected item (the email being read)
-        const item = Office.context.mailbox.item;
-  
-        // The display name of the current user (original recipient)
-        const userName = Office.context.mailbox.userProfile.displayName;
-  
-        // Prepare the new message
-        const messageOptions = {
-          toRecipients: ['ddriscoll@perrknight.com'],
-          subject: 'Forwarded email as attachment',
-          htmlBody: `
-            <p>Hello,</p>
-            <p>This email was originally received by: <strong>${userName}</strong></p>
-            <p>See attached original email.</p>
-          `,
-          attachments: [
-            {
-              // Mark as an item attachment
-              type: Office.MailboxEnums.AttachmentType.Item,
-              itemId: item.itemId
-            }
-          ]
-        };
-  
-        // Open the new mail form with the item attached
-        Office.context.mailbox.displayNewMessageForm(messageOptions);
-      }
-    });
+Office.onReady(function (info) {
+  if (info.host === Office.HostType.Outlook) {
+      console.log("Add-in is ready");
   }
-  
-  // Expose globally for the manifest
-  window.forwardAsAttachment = forwardAsAttachment;
+});
+
+function forwardAsAttachment(event) {
+  try {
+      var item = Office.context.mailbox.item;
+
+      if (!item) {
+          console.error("No email selected.");
+          event.completed();
+          return;
+      }
+
+      item.forwardAsAttachmentAsync(
+          {
+              toRecipients: ["ddriscoll@perrknight.com"], // Change to actual email
+              subject: "Forwarded Email",
+              body: "Here is the forwarded email."
+          },
+          function (asyncResult) {
+              if (asyncResult.status === Office.AsyncResultStatus.Succeeded) {
+                  console.log("Email forwarded successfully.");
+              } else {
+                  console.error("Error forwarding email: " + asyncResult.error.message);
+              }
+              event.completed();
+          }
+      );
+  } catch (error) {
+      console.error("Exception in forwardAsAttachment: ", error);
+      event.completed();
+  }
+}
